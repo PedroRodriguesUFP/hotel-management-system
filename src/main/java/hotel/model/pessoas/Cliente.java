@@ -12,11 +12,9 @@ public class Cliente extends Pessoa {
         this.nacionalidade = nacionalidade;
     }
 
-    // Getters
     public String getNif() { return nif; }
     public String getNacionalidade() { return nacionalidade; }
 
-    // Setters
     public void setNif(String nif) { this.nif = nif; }
     public void setNacionalidade(String nacionalidade) {
         this.nacionalidade = nacionalidade;

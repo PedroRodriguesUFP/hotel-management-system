@@ -12,12 +12,10 @@ public abstract class Pessoa {
         this.telefone = telefone;
     }
 
-    // Getters
     public String getNome() { return nome; }
     public String getEmail() { return email; }
     public String getTelefone() { return telefone; }
 
-    // Setters
     public void setNome(String nome) { this.nome = nome; }
     public void setEmail(String email) { this.email = email; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
