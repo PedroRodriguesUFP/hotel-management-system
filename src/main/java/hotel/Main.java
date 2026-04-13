@@ -1,6 +1,9 @@
 package hotel;
 
+import hotel.exception.ClienteJaExisteException;
+import hotel.exception.DataInvalidaException;
 import hotel.exception.QuartoIndisponivelException;
+import hotel.exception.ReservaNaoEncontradaException;
 import hotel.model.Hotel;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.QuartoDouble;
@@ -28,38 +31,66 @@ public class Main {
         meuHotel.adicionarQuarto(q102);
         meuHotel.adicionarQuarto(s201);
 
-        // 3. Criar Clientes
+        // 3. Registar Clientes — testa ClienteJaExisteException
+        System.out.println("--- A registar clientes ---");
         Cliente cli1 = new Cliente("João Silva", "joao@email.com", "912345678", "123456789", "Portuguesa");
         Cliente cli2 = new Cliente("Maria Santos", "maria@email.com", "987654321", "987654321", "Portuguesa");
-        meuHotel.adicionarCliente(cli1);
-        meuHotel.adicionarCliente(cli2);
+        Cliente cli3Duplicado = new Cliente("João Duplicado", "joao2@email.com", "911111111", "123456789", "Portuguesa");
 
-        // 4. Testar o Sistema
-        service.listarQuartosDisponiveis();
-
-        System.out.println("\n--- A realizar reservas ---");
         try {
-            // Reserva com sucesso
-            service.fazerReserva(cli1, q102, LocalDate.now(), LocalDate.now().plusDays(3));
-            System.out.println("Reserva 1 efetuada para: " + cli1.getNome());
-
-            // Tentar reservar o mesmo quarto para forçar a Exceção
-            service.fazerReserva(cli2, q102, LocalDate.now().plusDays(1), LocalDate.now().plusDays(4));
-
-        } catch (QuartoIndisponivelException e) {
-            // Aqui capturamos a nossa exceção personalizada!
-            System.out.println(e.getMessage());
+            service.registarCliente(cli1);
+            service.registarCliente(cli2);
+            service.registarCliente(cli3Duplicado); // NIF duplicado — deve lançar exceção
+        } catch (ClienteJaExisteException e) {
+            System.out.println("ERRO: " + e.getMessage());
         }
 
-        // Ver como ficaram os quartos após as reservas
+        // 4. Listar quartos disponíveis
+        service.listarQuartosDisponiveis();
+
+        // 5. Testar fazerReserva — testa DataInvalidaException
+        System.out.println("\n--- A testar data inválida ---");
+        try {
+            service.fazerReserva(cli1, q101, LocalDate.now().plusDays(3), LocalDate.now()); // saída antes da entrada
+        } catch (DataInvalidaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        } catch (QuartoIndisponivelException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
+
+        // 6. Testar fazerReserva — testa QuartoIndisponivelException
+        System.out.println("\n--- A realizar reservas ---");
+        try {
+            service.fazerReserva(cli1, q102, LocalDate.now(), LocalDate.now().plusDays(3));
+            System.out.println("-> Reserva 1 efetuada para: " + cli1.getNome());
+
+            service.fazerReserva(cli2, q102, LocalDate.now().plusDays(1), LocalDate.now().plusDays(4)); // quarto ocupado
+        } catch (QuartoIndisponivelException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        } catch (DataInvalidaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
+
+        // 7. Ver estado dos quartos e reservas
         service.listarQuartosDisponiveis();
         service.listarReservas();
 
-        System.out.println("\n--- A cancelar reserva ---");
-        // O id da primeira reserva será 1 (devido ao contadorId estático na classe Reserva)
-        service.cancelarReserva(1);
+        // 8. Testar cancelarReserva — testa ReservaNaoEncontradaException
+        System.out.println("\n--- A cancelar reservas ---");
+        try {
+            service.cancelarReserva(1); // deve funcionar
+            service.cancelarReserva(1); // já cancelada — deve lançar exceção
+        } catch (ReservaNaoEncontradaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
 
-        // Ver o estado final
+        try {
+            service.cancelarReserva(99); // id inexistente — deve lançar exceção
+        } catch (ReservaNaoEncontradaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
+
+        // 9. Estado final
         service.listarQuartosDisponiveis();
         service.listarReservas();
     }

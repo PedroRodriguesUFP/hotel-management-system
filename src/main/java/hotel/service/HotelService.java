@@ -1,6 +1,9 @@
 package hotel.service;
 
+import hotel.exception.ClienteJaExisteException;
+import hotel.exception.DataInvalidaException;
 import hotel.exception.QuartoIndisponivelException;
+import hotel.exception.ReservaNaoEncontradaException;
 import hotel.model.Hotel;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.Quarto;
@@ -17,42 +20,67 @@ public class HotelService {
         this.hotel = hotel;
     }
 
-    // Regra de Negócio: Fazer Reserva
-    public Reserva fazerReserva(Cliente cliente, Quarto quarto, LocalDate entrada, LocalDate saida) throws QuartoIndisponivelException {
+    // ── RESERVAS ──────────────────────────────────────────────────────────────
+
+    public Reserva fazerReserva(Cliente cliente, Quarto quarto,
+                                LocalDate entrada, LocalDate saida)
+            throws QuartoIndisponivelException, DataInvalidaException {
+
+        if (!entrada.isBefore(saida)) {
+            throw new DataInvalidaException();
+        }
+
         if (!quarto.isDisponivel()) {
-            throw new QuartoIndisponivelException("Erro: O quarto " + quarto.getNumero() + " já se encontra ocupado!");
+            throw new QuartoIndisponivelException(quarto.getNumero());
         }
 
         Reserva novaReserva = new Reserva(cliente, quarto, entrada, saida);
         novaReserva.setEstado(EstadoReserva.CONFIRMADA);
-
-        // Bloqueia o quarto
         quarto.setDisponivel(false);
 
         hotel.adicionarReserva(novaReserva);
         return novaReserva;
     }
 
-    // Regra de Negócio: Cancelar Reserva
-    public void cancelarReserva(int idReserva) {
+    public void cancelarReserva(int idReserva)
+            throws ReservaNaoEncontradaException {
+
         for (Reserva r : hotel.getReservas()) {
-            if (r.getId() == idReserva && r.getEstado() != EstadoReserva.CANCELADA) {
+            if (r.getId() == idReserva) {
+                if (r.getEstado() == EstadoReserva.CANCELADA) {
+                    throw new ReservaNaoEncontradaException(idReserva);
+                }
                 r.setEstado(EstadoReserva.CANCELADA);
-                r.getQuarto().setDisponivel(true); // Liberta o quarto novamente
+                r.getQuarto().setDisponivel(true);
                 System.out.println("-> Reserva #" + idReserva + " cancelada com sucesso. Quarto libertado.");
                 return;
             }
         }
-        System.out.println("-> Aviso: Reserva #" + idReserva + " não encontrada ou já se encontra cancelada.");
+        throw new ReservaNaoEncontradaException(idReserva);
     }
 
-    // Funcionalidade: Listar apenas quartos disponíveis
+    // ── CLIENTES ──────────────────────────────────────────────────────────────
+
+    public void registarCliente(Cliente cliente)
+            throws ClienteJaExisteException {
+
+        for (Cliente c : hotel.getClientes()) {
+            if (c.getNif().equals(cliente.getNif())) {
+                throw new ClienteJaExisteException(cliente.getNif());
+            }
+        }
+        hotel.adicionarCliente(cliente);
+        System.out.println("-> Cliente " + cliente.getNome() + " registado com sucesso.");
+    }
+
+    // ── LISTAGENS ─────────────────────────────────────────────────────────────
+
     public void listarQuartosDisponiveis() {
         System.out.println("\n--- Quartos Disponíveis ---");
         boolean encontrou = false;
         for (Quarto q : hotel.getQuartos()) {
             if (q.isDisponivel()) {
-                System.out.println(q.toString());
+                System.out.println(q);
                 encontrou = true;
             }
         }
@@ -61,11 +89,14 @@ public class HotelService {
         }
     }
 
-    // Funcionalidade: Listar todas as reservas
     public void listarReservas() {
         System.out.println("\n--- Registo de Reservas ---");
+        if (hotel.getReservas().isEmpty()) {
+            System.out.println("Não existem reservas registadas.");
+            return;
+        }
         for (Reserva r : hotel.getReservas()) {
-            System.out.println(r.toString());
+            System.out.println(r);
         }
     }
 }

@@ -1,7 +1,7 @@
 package hotel.exception;
 
-public class QuartoIndisponivelException extends Exception {
-    public QuartoIndisponivelException(String mensagem) {
-        super(mensagem);
+public class QuartoIndisponivelException extends RuntimeException {
+    public QuartoIndisponivelException(int numeroQuarto) {
+        super("O quarto " + numeroQuarto + " não está disponível.");
     }
 }
