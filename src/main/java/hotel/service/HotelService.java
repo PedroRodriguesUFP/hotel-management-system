@@ -2,6 +2,7 @@ package hotel.service;
 
 import hotel.exception.ClienteJaExisteException;
 import hotel.exception.DataInvalidaException;
+import hotel.exception.FormatoInvalidoException;
 import hotel.exception.QuartoIndisponivelException;
 import hotel.exception.ReservaNaoEncontradaException;
 import hotel.model.Hotel;
@@ -9,6 +10,7 @@ import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.Quarto;
 import hotel.model.reservas.EstadoReserva;
 import hotel.model.reservas.Reserva;
+import hotel.util.Validador;
 
 import java.time.LocalDate;
 
@@ -20,15 +22,32 @@ public class HotelService {
         this.hotel = hotel;
     }
 
+    // ── CLIENTES ──────────────────────────────────────────────────────────────
+
+    public void registarCliente(Cliente cliente)
+            throws ClienteJaExisteException, FormatoInvalidoException {
+
+        Validador.validarNome(cliente.getNome());
+        Validador.validarEmail(cliente.getEmail());
+        Validador.validarTelefone(cliente.getTelefone());
+        Validador.validarNif(cliente.getNif());
+
+        for (Cliente c : hotel.getClientes()) {
+            if (c.getNif().equals(cliente.getNif())) {
+                throw new ClienteJaExisteException(cliente.getNif());
+            }
+        }
+        hotel.adicionarCliente(cliente);
+        System.out.println("-> Cliente " + cliente.getNome() + " registado com sucesso.");
+    }
+
     // ── RESERVAS ──────────────────────────────────────────────────────────────
 
     public Reserva fazerReserva(Cliente cliente, Quarto quarto,
                                 LocalDate entrada, LocalDate saida)
             throws QuartoIndisponivelException, DataInvalidaException {
 
-        if (!entrada.isBefore(saida)) {
-            throw new DataInvalidaException();
-        }
+        Validador.validarDatas(entrada, saida);
 
         if (!quarto.isDisponivel()) {
             throw new QuartoIndisponivelException(quarto.getNumero());
@@ -59,18 +78,12 @@ public class HotelService {
         throw new ReservaNaoEncontradaException(idReserva);
     }
 
-    // ── CLIENTES ──────────────────────────────────────────────────────────────
+    // ── QUARTOS ───────────────────────────────────────────────────────────────
 
-    public void registarCliente(Cliente cliente)
-            throws ClienteJaExisteException {
-
-        for (Cliente c : hotel.getClientes()) {
-            if (c.getNif().equals(cliente.getNif())) {
-                throw new ClienteJaExisteException(cliente.getNif());
-            }
-        }
-        hotel.adicionarCliente(cliente);
-        System.out.println("-> Cliente " + cliente.getNome() + " registado com sucesso.");
+    public void adicionarQuarto(Quarto quarto) throws FormatoInvalidoException {
+        Validador.validarPrecoPorNoite(quarto.getPrecoPorNoite());
+        hotel.adicionarQuarto(quarto);
+        System.out.println("-> Quarto " + quarto.getNumero() + " adicionado com sucesso.");
     }
 
     // ── LISTAGENS ─────────────────────────────────────────────────────────────
