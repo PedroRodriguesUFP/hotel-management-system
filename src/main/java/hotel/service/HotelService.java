@@ -2,6 +2,8 @@ package hotel.service;
 
 import hotel.exception.*;
 import hotel.model.Hotel;
+import hotel.model.pagamentos.MetodoPagamento;
+import hotel.model.pagamentos.Pagamento;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.Quarto;
 import hotel.model.reservas.EstadoReserva;
@@ -146,5 +148,26 @@ public class HotelService {
                 .filter(r -> r.getId() == idReserva)
                 .findFirst()
                 .orElseThrow(() -> new ReservaNaoEncontradaException(idReserva));
+    }
+
+    public Pagamento efetuarPagamento(int idReserva, MetodoPagamento metodo)
+            throws ReservaNaoEncontradaException, ReservaNaoConcluidaException, PagamentoJaEfetuadoException {
+
+        Reserva reserva = encontrarReserva(idReserva);
+
+        if (reserva.getEstado() != EstadoReserva.CONCLUIDA) {
+            throw new ReservaNaoConcluidaException(idReserva);
+        }
+
+        boolean jaFoiPago = hotel.getPagamentos().stream()
+                .anyMatch(p -> p.getReserva().getId() == idReserva);
+        if (jaFoiPago) {
+            throw new PagamentoJaEfetuadoException(idReserva);
+        }
+
+        Pagamento pagamento = new Pagamento(reserva, metodo);
+        hotel.adicionarPagamento(pagamento);
+        System.out.println("-> Pagamento efetuado com sucesso! " + pagamento);
+        return pagamento;
     }
 }

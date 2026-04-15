@@ -2,6 +2,7 @@ package hotel;
 
 import hotel.exception.*;
 import hotel.model.Hotel;
+import hotel.model.pagamentos.MetodoPagamento;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.QuartoDouble;
 import hotel.model.quartos.QuartoSimples;
@@ -107,6 +108,13 @@ public class Main {
         } catch (CheckInInvalidoException | CheckOutInvalidoException |
                  ReservaNaoEncontradaException | QuartoIndisponivelException |
                  DataInvalidaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
+        System.out.println("\n--- A testar Pagamentos ---");
+        try {
+            service.efetuarPagamento(2, MetodoPagamento.CARTAO);
+            service.efetuarPagamento(2, MetodoPagamento.NUMERARIO); // duplicado — deve falhar
+        } catch (PagamentoJaEfetuadoException | ReservaNaoConcluidaException | ReservaNaoEncontradaException e) {
             System.out.println("ERRO: " + e.getMessage());
         }
     }

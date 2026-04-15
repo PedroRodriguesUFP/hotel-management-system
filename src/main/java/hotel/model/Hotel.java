@@ -1,5 +1,6 @@
 package hotel.model;
 
+import hotel.model.pagamentos.Pagamento;
 import hotel.model.pessoas.Cliente;
 import hotel.model.pessoas.Funcionario;
 import hotel.model.quartos.Quarto;
@@ -34,4 +35,7 @@ public class Hotel {
     public void adicionarCliente(Cliente c) { clientes.add(c); }
     public void adicionarFuncionario(Funcionario f) { funcionarios.add(f); }
     public void adicionarReserva(Reserva r) { reservas.add(r); }
+    private List<Pagamento> pagamentos = new ArrayList<>();
+    public List<Pagamento> getPagamentos() { return pagamentos; }
+    public void adicionarPagamento(Pagamento p) { pagamentos.add(p); }
 }
