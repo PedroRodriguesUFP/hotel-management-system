@@ -1,10 +1,6 @@
 package hotel.service;
 
-import hotel.exception.ClienteJaExisteException;
-import hotel.exception.DataInvalidaException;
-import hotel.exception.FormatoInvalidoException;
-import hotel.exception.QuartoIndisponivelException;
-import hotel.exception.ReservaNaoEncontradaException;
+import hotel.exception.*;
 import hotel.model.Hotel;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.Quarto;
@@ -61,21 +57,16 @@ public class HotelService {
         return novaReserva;
     }
 
-    public void cancelarReserva(int idReserva)
-            throws ReservaNaoEncontradaException {
+    public void cancelarReserva(int idReserva) throws ReservaNaoEncontradaException {
+        Reserva reserva = encontrarReserva(idReserva);
 
-        for (Reserva r : hotel.getReservas()) {
-            if (r.getId() == idReserva) {
-                if (r.getEstado() == EstadoReserva.CANCELADA) {
-                    throw new ReservaNaoEncontradaException(idReserva);
-                }
-                r.setEstado(EstadoReserva.CANCELADA);
-                r.getQuarto().setDisponivel(true);
-                System.out.println("-> Reserva #" + idReserva + " cancelada com sucesso. Quarto libertado.");
-                return;
-            }
+        if (reserva.getEstado() == EstadoReserva.CANCELADA) {
+            throw new ReservaNaoEncontradaException(idReserva);
         }
-        throw new ReservaNaoEncontradaException(idReserva);
+
+        reserva.setEstado(EstadoReserva.CANCELADA);
+        reserva.getQuarto().setDisponivel(true);
+        System.out.println("-> Reserva #" + idReserva + " cancelada com sucesso. Quarto libertado.");
     }
 
     // ── QUARTOS ───────────────────────────────────────────────────────────────
@@ -111,5 +102,49 @@ public class HotelService {
         for (Reserva r : hotel.getReservas()) {
             System.out.println(r);
         }
+    }
+    // ── CHECK-IN / CHECK-OUT ──────────────────────────────────────────────────
+
+    public void fazerCheckIn(int idReserva)
+            throws ReservaNaoEncontradaException, CheckInInvalidoException {
+
+        Reserva reserva = encontrarReserva(idReserva);
+
+        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
+            throw new CheckInInvalidoException(idReserva,
+                    "a reserva tem de estar CONFIRMADA (estado atual: " + reserva.getEstado() + ")");
+        }
+        if (LocalDate.now().isBefore(reserva.getDataEntrada())) {
+            throw new CheckInInvalidoException(idReserva,
+                    "ainda não chegou a data de entrada (" + reserva.getDataEntrada() + ")");
+        }
+
+        reserva.setEstado(EstadoReserva.CHECKIN);
+        System.out.println("-> Check-in efetuado com sucesso na reserva #" + idReserva);
+    }
+
+    public void fazerCheckOut(int idReserva)
+            throws ReservaNaoEncontradaException, CheckOutInvalidoException {
+
+        Reserva reserva = encontrarReserva(idReserva);
+
+        if (reserva.getEstado() != EstadoReserva.CHECKIN) {
+            throw new CheckOutInvalidoException(idReserva,
+                    "o hóspede tem de estar em CHECKIN (estado atual: " + reserva.getEstado() + ")");
+        }
+
+        reserva.setEstado(EstadoReserva.CONCLUIDA);
+        reserva.getQuarto().setDisponivel(true);
+        System.out.println("-> Check-out efetuado com sucesso na reserva #" + idReserva
+                + " | Total: " + reserva.getPrecoTotal() + "€");
+    }
+
+// ── MÉTODO AUXILIAR PRIVADO ───────────────────────────────────────────────
+
+    private Reserva encontrarReserva(int idReserva) throws ReservaNaoEncontradaException {
+        return hotel.getReservas().stream()
+                .filter(r -> r.getId() == idReserva)
+                .findFirst()
+                .orElseThrow(() -> new ReservaNaoEncontradaException(idReserva));
     }
 }

@@ -4,5 +4,6 @@ public enum EstadoReserva {
     PENDENTE,
     CONFIRMADA,
     CANCELADA,
+    CHECKIN,
     CONCLUIDA
 }

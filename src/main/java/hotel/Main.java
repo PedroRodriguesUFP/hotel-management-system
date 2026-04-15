@@ -1,9 +1,6 @@
 package hotel;
 
-import hotel.exception.ClienteJaExisteException;
-import hotel.exception.DataInvalidaException;
-import hotel.exception.QuartoIndisponivelException;
-import hotel.exception.ReservaNaoEncontradaException;
+import hotel.exception.*;
 import hotel.model.Hotel;
 import hotel.model.pessoas.Cliente;
 import hotel.model.quartos.QuartoDouble;
@@ -93,5 +90,25 @@ public class Main {
         // 9. Estado final
         service.listarQuartosDisponiveis();
         service.listarReservas();
+        System.out.println("\n--- A testar Check-in / Check-out ---");
+        try {
+            service.fazerCheckIn(1);
+            service.fazerCheckOut(1);
+        } catch (CheckInInvalidoException | CheckOutInvalidoException | ReservaNaoEncontradaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
+        // Faz uma reserva nova para testar check-in/check-out
+        System.out.println("\n--- A testar Check-in / Check-out ---");
+        try {
+            service.fazerReserva(cli1, q101, LocalDate.now(), LocalDate.now().plusDays(2));
+            // Esta reserva terá id=2 (o contador continua do anterior)
+            service.fazerCheckIn(2);
+            service.fazerCheckOut(2);
+        } catch (CheckInInvalidoException | CheckOutInvalidoException |
+                 ReservaNaoEncontradaException | QuartoIndisponivelException |
+                 DataInvalidaException e) {
+            System.out.println("ERRO: " + e.getMessage());
+        }
     }
+
 }
