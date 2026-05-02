@@ -18,7 +18,7 @@ public class ClientesView {
         painel.setPadding(new Insets(30));
         painel.setStyle("-fx-background-color: #1a1a2e;");
 
-        Label titulo = new Label("👥 Gestão de Clientes");
+        Label titulo = new Label(" Gestão de Clientes");
         titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Formulário de registo
@@ -42,7 +42,7 @@ public class ClientesView {
                 -fx-background-radius: 10;
                 """);
 
-        Label lblForm = new Label("➕ Registar Novo Cliente");
+        Label lblForm = new Label(" Registar Novo Cliente");
         lblForm.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // Campos
@@ -79,7 +79,7 @@ public class ClientesView {
                 controller.getHotelService().registarCliente(novo);
 
                 lblMensagem.setStyle("-fx-text-fill: #00c853; -fx-font-size: 13px;");
-                lblMensagem.setText("✅ Cliente registado com sucesso!");
+                lblMensagem.setText(" Cliente registado com sucesso!");
 
                 // Limpar campos
                 txtNome.clear();
@@ -90,7 +90,7 @@ public class ClientesView {
 
             } catch (ClienteJaExisteException | FormatoInvalidoException ex) {
                 lblMensagem.setStyle("-fx-text-fill: #ff5252; -fx-font-size: 13px;");
-                lblMensagem.setText("❌ " + ex.getMessage());
+                lblMensagem.setText(" " + ex.getMessage());
             }
         });
 
@@ -121,15 +121,15 @@ public class ClientesView {
                     -fx-background-radius: 8;
                     """);
 
-            Label nome = new Label("👤 " + c.getNome());
+            Label nome = new Label(" " + c.getNome());
             nome.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
             nome.setPrefWidth(150);
 
-            Label email = new Label("✉ " + c.getEmail());
+            Label email = new Label(" " + c.getEmail());
             email.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px;");
             email.setPrefWidth(180);
 
-            Label nif = new Label("🪪 " + c.getNif());
+            Label nif = new Label(" " + c.getNif());
             nif.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px;");
 
             linha.getChildren().addAll(nome, email, nif);

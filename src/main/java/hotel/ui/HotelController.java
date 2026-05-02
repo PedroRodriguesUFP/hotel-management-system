@@ -35,7 +35,7 @@ public class HotelController {
             hotelService.adicionarQuarto(new Suite(201, 2, 200.0, 2, true));
 
             // Clientes
-            hotelService.registarCliente(new Cliente("João Silva",
+            hotelService.registarCliente(new Cliente("Joao Silva",
                     "joao@email.com", "910000001", "123456789", "Portuguesa"));
             hotelService.registarCliente(new Cliente("Maria Santos",
                     "maria@email.com", "910000002", "987654321", "Portuguesa"));

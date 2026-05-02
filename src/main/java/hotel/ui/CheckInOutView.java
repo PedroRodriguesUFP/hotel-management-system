@@ -19,7 +19,7 @@ public class CheckInOutView {
         painel.setPadding(new Insets(30));
         painel.setStyle("-fx-background-color: #1a1a2e;");
 
-        Label titulo = new Label("✅ Check-in / Check-out");
+        Label titulo = new Label(" Check-in / Check-out");
         titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         VBox listaReservas = criarListaReservas();
@@ -78,11 +78,11 @@ public class CheckInOutView {
         // Botões
         HBox botoes = new HBox(10);
 
-        Button btnCheckIn = new Button("✅ Check-in");
+        Button btnCheckIn = new Button(" Check-in");
         btnCheckIn.setStyle(estiloBtn("#0f3460"));
         btnCheckIn.setDisable(reserva.getEstado() != EstadoReserva.CONFIRMADA);
 
-        Button btnCheckOut = new Button("🚪 Check-out");
+        Button btnCheckOut = new Button(" Check-out");
         btnCheckOut.setStyle(estiloBtn("#0f3460"));
         btnCheckOut.setDisable(reserva.getEstado() != EstadoReserva.CHECKIN);
 
@@ -103,13 +103,13 @@ public class CheckInOutView {
                 estado.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: "
                         + corEstado(reserva.getEstado()) + ";");
                 lblMensagem.setStyle("-fx-text-fill: #00c853;");
-                lblMensagem.setText("✅ Check-in efetuado com sucesso!");
+                lblMensagem.setText(" Check-in efetuado com sucesso!");
                 btnCheckIn.setDisable(true);
                 btnCheckOut.setDisable(false);
                 cmbPagamento.setVisible(true);
             } catch (ReservaNaoEncontradaException | CheckInInvalidoException ex) {
                 lblMensagem.setStyle("-fx-text-fill: #ff5252;");
-                lblMensagem.setText("❌ " + ex.getMessage());
+                lblMensagem.setText(" " + ex.getMessage());
             }
         });
 
@@ -117,7 +117,7 @@ public class CheckInOutView {
             try {
                 if (cmbPagamento.getValue() == null) {
                     lblMensagem.setStyle("-fx-text-fill: #ff5252;");
-                    lblMensagem.setText("❌ Seleciona um método de pagamento!");
+                    lblMensagem.setText(" Seleciona um método de pagamento!");
                     return;
                 }
 
@@ -129,7 +129,7 @@ public class CheckInOutView {
                 estado.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: "
                         + corEstado(reserva.getEstado()) + ";");
                 lblMensagem.setStyle("-fx-text-fill: #00c853;");
-                lblMensagem.setText("✅ Check-out e pagamento efetuados! Total: "
+                lblMensagem.setText(" Check-out e pagamento efetuados! Total: "
                         + reserva.getPrecoTotal() + "€");
                 btnCheckOut.setDisable(true);
                 cmbPagamento.setVisible(false);
@@ -137,7 +137,7 @@ public class CheckInOutView {
             } catch (ReservaNaoEncontradaException | CheckOutInvalidoException
                      | ReservaNaoConcluidaException | PagamentoJaEfetuadoException ex) {
                 lblMensagem.setStyle("-fx-text-fill: #ff5252;");
-                lblMensagem.setText("❌ " + ex.getMessage());
+                lblMensagem.setText(" " + ex.getMessage());
             }
         });
 

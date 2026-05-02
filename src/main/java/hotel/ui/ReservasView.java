@@ -15,7 +15,7 @@ public class ReservasView {
 
     private HotelController controller = HotelController.getInstancia();
 
-    public VBox getView() {
+    public ScrollPane getView() { // Alterado o retorno para ScrollPane
         VBox painel = new VBox(20);
         painel.setPadding(new Insets(30));
         painel.setStyle("-fx-background-color: #1a1a2e;");
@@ -31,7 +31,13 @@ public class ReservasView {
         VBox listaReservas = criarListaReservas();
 
         painel.getChildren().addAll(titulo, form, lblLista, listaReservas);
-        return painel;
+
+        // Envolver o painel no ScrollPane
+        ScrollPane scroll = new ScrollPane(painel);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: #1a1a2e; -fx-background-color: transparent;");
+
+        return scroll;
     }
 
     private VBox criarFormulario() {
@@ -184,11 +190,11 @@ public class ReservasView {
             id.setStyle("-fx-text-fill: #e94560; -fx-font-weight: bold; -fx-font-size: 13px;");
             id.setPrefWidth(30);
 
-            Label cliente = new Label("👤 " + r.getCliente().getNome());
+            Label cliente = new Label(" " + r.getCliente().getNome());
             cliente.setStyle("-fx-text-fill: white; -fx-font-size: 13px;");
             cliente.setPrefWidth(130);
 
-            Label quarto = new Label("🛏 Quarto " + r.getQuarto().getNumero());
+            Label quarto = new Label(" Quarto " + r.getQuarto().getNumero());
             quarto.setStyle("-fx-text-fill: #aaaaaa; -fx-font-size: 13px;");
             quarto.setPrefWidth(100);
 

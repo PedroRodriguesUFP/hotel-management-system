@@ -39,7 +39,7 @@ public class MainApp extends Application {
         topo.setPadding(new Insets(15, 20, 15, 20));
         topo.setStyle("-fx-background-color: #16213e;");
 
-        Label titulo = new Label("🏨 Hotel Management System");
+        Label titulo = new Label("Hotel Management System");
         titulo.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         topo.getChildren().add(titulo);
@@ -52,8 +52,8 @@ public class MainApp extends Application {
         menu.setStyle("-fx-background-color: #0f3460;");
         menu.setPrefWidth(180);
 
-        String[] opcoes = {"📊 Dashboard", "🛏 Quartos", "👥 Clientes",
-                "📋 Reservas", "✅ Check-in/out"};
+        String[] opcoes = {" Dashboard", " Quartos", " Clientes",
+                " Reservas", " Check-in/out"};
 
         for (String opcao : opcoes) {
             Button btn = new Button(opcao);
@@ -94,27 +94,17 @@ public class MainApp extends Application {
 
     private void tratarNavegacao(String opcao) {
         switch (opcao) {
-            case "📊 Dashboard" -> mostrarDashboard();
-            case "🛏 Quartos" -> mostrarQuartos();
-            case "👥 Clientes" -> mostrarClientes();
-            case "📋 Reservas" -> mostrarReservas();
-            case "✅ Check-in/out" -> mostrarCheckin();
+            case " Dashboard" -> mostrarDashboard();
+            case " Quartos" -> mostrarQuartos();
+            case " Clientes" -> mostrarClientes();
+            case " Reservas" -> mostrarReservas();
+            case " Check-in/out" -> mostrarCheckin();
         }
     }
 
     private void mostrarDashboard() {
-        VBox painel = new VBox(20);
-        painel.setPadding(new Insets(30));
-        painel.setStyle("-fx-background-color: #1a1a2e;");
-
-        Label titulo = new Label("Dashboard");
-        titulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
-
-        Label sub = new Label("Bem-vindo ao sistema de gestão do hotel!");
-        sub.setStyle("-fx-font-size: 14px; -fx-text-fill: #aaaaaa;");
-
-        painel.getChildren().addAll(titulo, sub);
-        root.setCenter(painel);
+        DashboardView dashboardView = new DashboardView();
+        root.setCenter(dashboardView.getView());
     }
 
     private void mostrarQuartos() {
