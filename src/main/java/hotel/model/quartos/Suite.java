@@ -1,26 +1,26 @@
 package hotel.model.quartos;
 
-public class Suite extends Quarto {
+public class Suite extends Room {
 
-    private int numeroQuartos;
-    private boolean temJacuzzi;
+    private int numberOfRooms;
+    private boolean hasJacuzzi;
 
-    public Suite(int numero, int andar, double precoPorNoite,
-                 int numeroQuartos, boolean temJacuzzi) {
-        super(numero, andar, precoPorNoite);
-        this.numeroQuartos = numeroQuartos;
-        this.temJacuzzi = temJacuzzi;
+    public Suite(int number, int floor, double pricePerNight,
+                 int numberOfRooms, boolean hasJacuzzi) {
+        super(number, floor, pricePerNight);
+        this.numberOfRooms = numberOfRooms;
+        this.hasJacuzzi = hasJacuzzi;
     }
 
-    public int getNumeroQuartos() { return numeroQuartos; }
-    public boolean isTemJacuzzi() { return temJacuzzi; }
+    public int getNumberOfRooms() { return numberOfRooms; }
+    public boolean isHasJacuzzi() { return hasJacuzzi; }
 
     @Override
-    public String getTipoQuarto() { return "Suite"; }
+    public String getRoomType() { return "Suite"; }
 
     @Override
     public String toString() {
-        return super.toString() + " | Quartos: " + numeroQuartos +
-                " | Jacuzzi: " + (temJacuzzi ? "Sim" : "Não");
+        return super.toString() + " | Rooms: " + numberOfRooms +
+                " | Jacuzzi: " + (hasJacuzzi ? "Yes" : "No");
     }
 }

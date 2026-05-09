@@ -2,31 +2,33 @@ package hotel.ui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
     private BorderPane root;
+    private CustomersView customersView;
+    private ReservationsView reservationsView;
+    private RoomsView roomsView;
+    private CheckInOutView checkInOutView;
 
     @Override
     public void start(Stage stage) {
         root = new BorderPane();
+        root.setTop(createHeader());
+        root.setLeft(createSidebar());
+        showDashboard();
 
-        // Topo
-        HBox topo = criarTopo();
-        root.setTop(topo);
-
-        // Menu lateral
-        VBox menuLateral = criarMenuLateral();
-        root.setLeft(menuLateral);
-
-        // Painel inicial
-        mostrarDashboard();
+        customersView = new CustomersView();
+        reservationsView = new ReservationsView();
+        roomsView = new RoomsView();
+        checkInOutView = new CheckInOutView();
 
         Scene scene = new Scene(root, 1000, 650);
         stage.setTitle("Hotel Management System");
@@ -34,112 +36,72 @@ public class MainApp extends Application {
         stage.show();
     }
 
-    private HBox criarTopo() {
-        HBox topo = new HBox();
-        topo.setPadding(new Insets(15, 20, 15, 20));
-        topo.setStyle("-fx-background-color: #16213e;");
+    private HBox createHeader() {
+        HBox header = new HBox();
+        header.setPadding(new Insets(15, 20, 15, 20));
+        header.setStyle("-fx-background-color: #16213e;");
 
-        Label titulo = new Label("Hotel Management System");
-        titulo.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
+        Label title = new Label("Hotel Management System");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        topo.getChildren().add(titulo);
-        return topo;
+        header.getChildren().add(title);
+        return header;
     }
 
-    private VBox criarMenuLateral() {
+    private VBox createSidebar() {
         VBox menu = new VBox(10);
         menu.setPadding(new Insets(20, 10, 20, 10));
         menu.setStyle("-fx-background-color: #0f3460;");
         menu.setPrefWidth(180);
 
-        String[] opcoes = {" Dashboard", " Quartos", " Clientes",
-                " Reservas", " Check-in/out"};
+        String[] options = {" Dashboard", " Rooms", " Customers", " Reservations", " Check-in/out"};
 
-        for (String opcao : opcoes) {
-            Button btn = new Button(opcao);
-            btn.setPrefWidth(160);
-            btn.setStyle("""
-                -fx-background-color: transparent;
-                -fx-text-fill: white;
-                -fx-font-size: 14px;
-                -fx-alignment: CENTER-LEFT;
-                -fx-padding: 10px;
-                -fx-cursor: hand;
-            """);
-
-            btn.setOnMouseEntered(e -> btn.setStyle("""
-                -fx-background-color: #e94560;
-                -fx-text-fill: white;
-                -fx-font-size: 14px;
-                -fx-alignment: CENTER-LEFT;
-                -fx-padding: 10px;
-                -fx-cursor: hand;
-            """));
-
-            btn.setOnMouseExited(e -> btn.setStyle("""
-                -fx-background-color: transparent;
-                -fx-text-fill: white;
-                -fx-font-size: 14px;
-                -fx-alignment: CENTER-LEFT;
-                -fx-padding: 10px;
-                -fx-cursor: hand;
-            """));
-
-            btn.setOnAction(e -> tratarNavegacao(opcao));
-            menu.getChildren().add(btn);
+        for (String option : options) {
+            Button button = new Button(option);
+            button.setPrefWidth(160);
+            button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER-LEFT; -fx-padding: 10px; -fx-cursor: hand;");
+            button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #e94560; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER-LEFT; -fx-padding: 10px; -fx-cursor: hand;"));
+            button.setOnMouseExited(e -> button.setStyle("-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px; -fx-alignment: CENTER-LEFT; -fx-padding: 10px; -fx-cursor: hand;"));
+            button.setOnAction(e -> handleNavigation(option));
+            menu.getChildren().add(button);
         }
 
         return menu;
     }
 
-    private void tratarNavegacao(String opcao) {
-        switch (opcao) {
-            case " Dashboard" -> mostrarDashboard();
-            case " Quartos" -> mostrarQuartos();
-            case " Clientes" -> mostrarClientes();
-            case " Reservas" -> mostrarReservas();
-            case " Check-in/out" -> mostrarCheckin();
+    private void handleNavigation(String option) {
+        switch (option) {
+            case " Dashboard" -> showDashboard();
+            case " Rooms" -> showRooms();
+            case " Customers" -> showCustomers();
+            case " Reservations" -> showReservations();
+            case " Check-in/out" -> showCheckIn();
         }
     }
 
-    private void mostrarDashboard() {
-        DashboardView dashboardView = new DashboardView();
-        root.setCenter(dashboardView.getView());
+    private void showDashboard() {
+        root.setCenter(new DashboardView().getView());
     }
 
-    private void mostrarQuartos() {
-        QuartosView quartosView = new QuartosView();
-        root.setCenter(quartosView.getView());
+    private void showRooms() {
+        roomsView.refreshGrid();
+        root.setCenter(roomsView.getView());
     }
 
-    private void mostrarClientes() {
-        ClientesView clientesView = new ClientesView();
-        root.setCenter(clientesView.getView());
+    private void showCustomers() {
+        customersView.refreshCustomerList();
+        root.setCenter(customersView.getView());
     }
 
-    private void mostrarReservas() {
-        ReservasView reservasView = new ReservasView();
-        root.setCenter(reservasView.getView());
+    private void showReservations() {
+        reservationsView.refreshReservationList();
+        reservationsView.refreshCombos();
+        root.setCenter(reservationsView.getView());
     }
 
-    private void mostrarCheckin() {
-        CheckInOutView checkInOutView = new CheckInOutView();
+    private void showCheckIn() {
+        checkInOutView.refreshReservationList();
         root.setCenter(checkInOutView.getView());
-    }
-
-    private void mostrarPainelSimples(String titulo, String mensagem) {
-        VBox painel = new VBox(20);
-        painel.setPadding(new Insets(30));
-        painel.setStyle("-fx-background-color: #1a1a2e;");
-
-        Label lblTitulo = new Label(titulo);
-        lblTitulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;");
-
-        Label lblMsg = new Label(mensagem);
-        lblMsg.setStyle("-fx-font-size: 14px; -fx-text-fill: #aaaaaa;");
-
-        painel.getChildren().addAll(lblTitulo, lblMsg);
-        root.setCenter(painel);
     }
 
     public static void main(String[] args) {

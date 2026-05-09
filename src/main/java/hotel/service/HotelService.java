@@ -2,172 +2,163 @@ package hotel.service;
 
 import hotel.exception.*;
 import hotel.model.Hotel;
-import hotel.model.pagamentos.MetodoPagamento;
-import hotel.model.pagamentos.Pagamento;
-import hotel.model.pessoas.Cliente;
-import hotel.model.quartos.Quarto;
-import hotel.model.reservas.EstadoReserva;
-import hotel.model.reservas.Reserva;
-import hotel.util.Validador;
+import hotel.model.pagamentos.Payment;
+import hotel.model.pagamentos.PaymentMethod;
+import hotel.model.pessoas.Customer;
+import hotel.model.quartos.Room;
+import hotel.model.reservas.Reservation;
+import hotel.model.reservas.ReservationStatus;
+import hotel.util.Validator;
 
 import java.time.LocalDate;
 
 public class HotelService {
 
-    private Hotel hotel;
+    private final Hotel hotel;
 
     public HotelService(Hotel hotel) {
         this.hotel = hotel;
     }
 
-    // ── CLIENTES ──────────────────────────────────────────────────────────────
+    public void registerCustomer(Customer customer)
+            throws CustomerAlreadyExistsException, InvalidFormatException {
 
-    public void registarCliente(Cliente cliente)
-            throws ClienteJaExisteException, FormatoInvalidoException {
+        Validator.validateName(customer.getName());
+        Validator.validateEmail(customer.getEmail());
+        Validator.validatePhone(customer.getPhone());
+        Validator.validateTaxId(customer.getTaxId());
 
-        Validador.validarNome(cliente.getNome());
-        Validador.validarEmail(cliente.getEmail());
-        Validador.validarTelefone(cliente.getTelefone());
-        Validador.validarNif(cliente.getNif());
-
-        for (Cliente c : hotel.getClientes()) {
-            if (c.getNif().equals(cliente.getNif())) {
-                throw new ClienteJaExisteException(cliente.getNif());
+        for (Customer existing : hotel.getCustomers()) {
+            if (existing.getTaxId().equals(customer.getTaxId())) {
+                throw new CustomerAlreadyExistsException(customer.getTaxId());
             }
         }
-        hotel.adicionarCliente(cliente);
-        System.out.println("-> Cliente " + cliente.getNome() + " registado com sucesso.");
+
+        hotel.addCustomer(customer);
+        System.out.println("-> Customer " + customer.getName() + " registered successfully.");
     }
 
-    // ── RESERVAS ──────────────────────────────────────────────────────────────
+    public Reservation makeReservation(Customer customer, Room room,
+                                       LocalDate checkInDate, LocalDate checkOutDate)
+            throws RoomUnavailableException, InvalidDateException {
 
-    public Reserva fazerReserva(Cliente cliente, Quarto quarto,
-                                LocalDate entrada, LocalDate saida)
-            throws QuartoIndisponivelException, DataInvalidaException {
+        Validator.validateDates(checkInDate, checkOutDate);
 
-        Validador.validarDatas(entrada, saida);
-
-        if (!quarto.isDisponivel()) {
-            throw new QuartoIndisponivelException(quarto.getNumero());
+        if (!room.isAvailable()) {
+            throw new RoomUnavailableException(room.getNumber());
         }
 
-        Reserva novaReserva = new Reserva(cliente, quarto, entrada, saida);
-        novaReserva.setEstado(EstadoReserva.CONFIRMADA);
-        quarto.setDisponivel(false);
-
-        hotel.adicionarReserva(novaReserva);
-        return novaReserva;
+        Reservation reservation = new Reservation(customer, room, checkInDate, checkOutDate);
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        room.setAvailable(false);
+        hotel.addReservation(reservation);
+        return reservation;
     }
 
-    public void cancelarReserva(int idReserva) throws ReservaNaoEncontradaException {
-        Reserva reserva = encontrarReserva(idReserva);
+    public void cancelReservation(int reservationId)
+            throws ReservationNotFoundException, ReservationAlreadyCancelledException {
 
-        if (reserva.getEstado() == EstadoReserva.CANCELADA) {
-            throw new ReservaNaoEncontradaException(idReserva);
+        Reservation reservation = findReservation(reservationId);
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new ReservationAlreadyCancelledException(reservationId);
         }
 
-        reserva.setEstado(EstadoReserva.CANCELADA);
-        reserva.getQuarto().setDisponivel(true);
-        System.out.println("-> Reserva #" + idReserva + " cancelada com sucesso. Quarto libertado.");
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservation.getRoom().setAvailable(true);
+        System.out.println("-> Reservation #" + reservationId + " cancelled successfully. Room released.");
     }
 
-    // ── QUARTOS ───────────────────────────────────────────────────────────────
-
-    public void adicionarQuarto(Quarto quarto) throws FormatoInvalidoException {
-        Validador.validarPrecoPorNoite(quarto.getPrecoPorNoite());
-        hotel.adicionarQuarto(quarto);
-        System.out.println("-> Quarto " + quarto.getNumero() + " adicionado com sucesso.");
+    public void addRoom(Room room) throws InvalidFormatException {
+        Validator.validatePricePerNight(room.getPricePerNight());
+        hotel.addRoom(room);
+        System.out.println("-> Room " + room.getNumber() + " added successfully.");
     }
 
-    // ── LISTAGENS ─────────────────────────────────────────────────────────────
-
-    public void listarQuartosDisponiveis() {
-        System.out.println("\n--- Quartos Disponíveis ---");
-        boolean encontrou = false;
-        for (Quarto q : hotel.getQuartos()) {
-            if (q.isDisponivel()) {
-                System.out.println(q);
-                encontrou = true;
+    public void listAvailableRooms() {
+        System.out.println("\n--- Available Rooms ---");
+        boolean found = false;
+        for (Room room : hotel.getRooms()) {
+            if (room.isAvailable()) {
+                System.out.println(room);
+                found = true;
             }
         }
-        if (!encontrou) {
-            System.out.println("De momento, não há quartos disponíveis.");
+        if (!found) {
+            System.out.println("There are no available rooms at the moment.");
         }
     }
 
-    public void listarReservas() {
-        System.out.println("\n--- Registo de Reservas ---");
-        if (hotel.getReservas().isEmpty()) {
-            System.out.println("Não existem reservas registadas.");
+    public void listReservations() {
+        System.out.println("\n--- Reservation Log ---");
+        if (hotel.getReservations().isEmpty()) {
+            System.out.println("No reservations have been registered.");
             return;
         }
-        for (Reserva r : hotel.getReservas()) {
-            System.out.println(r);
+        for (Reservation reservation : hotel.getReservations()) {
+            System.out.println(reservation);
         }
     }
-    // ── CHECK-IN / CHECK-OUT ──────────────────────────────────────────────────
 
-    public void fazerCheckIn(int idReserva)
-            throws ReservaNaoEncontradaException, CheckInInvalidoException {
+    public void checkIn(int reservationId)
+            throws ReservationNotFoundException, InvalidCheckInException {
 
-        Reserva reserva = encontrarReserva(idReserva);
+        Reservation reservation = findReservation(reservationId);
 
-        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
-            throw new CheckInInvalidoException(idReserva,
-                    "a reserva tem de estar CONFIRMADA (estado atual: " + reserva.getEstado() + ")");
+        if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new InvalidCheckInException(reservationId,
+                    "the reservation must be CONFIRMED (current status: " + reservation.getStatus() + ")");
         }
-        if (LocalDate.now().isBefore(reserva.getDataEntrada())) {
-            throw new CheckInInvalidoException(idReserva,
-                    "ainda não chegou a data de entrada (" + reserva.getDataEntrada() + ")");
+        if (LocalDate.now().isBefore(reservation.getCheckInDate())) {
+            throw new InvalidCheckInException(reservationId,
+                    "the check-in date has not been reached yet (" + reservation.getCheckInDate() + ")");
         }
 
-        reserva.setEstado(EstadoReserva.CHECKIN);
-        System.out.println("-> Check-in efetuado com sucesso na reserva #" + idReserva);
+        reservation.setStatus(ReservationStatus.CHECKED_IN);
+        System.out.println("-> Check-in completed successfully for reservation #" + reservationId);
     }
 
-    public void fazerCheckOut(int idReserva)
-            throws ReservaNaoEncontradaException, CheckOutInvalidoException {
+    public void checkOut(int reservationId)
+            throws ReservationNotFoundException, InvalidCheckOutException {
 
-        Reserva reserva = encontrarReserva(idReserva);
+        Reservation reservation = findReservation(reservationId);
 
-        if (reserva.getEstado() != EstadoReserva.CHECKIN) {
-            throw new CheckOutInvalidoException(idReserva,
-                    "o hóspede tem de estar em CHECKIN (estado atual: " + reserva.getEstado() + ")");
+        if (reservation.getStatus() != ReservationStatus.CHECKED_IN) {
+            throw new InvalidCheckOutException(reservationId,
+                    "the guest must be CHECKED_IN (current status: " + reservation.getStatus() + ")");
         }
 
-        reserva.setEstado(EstadoReserva.CONCLUIDA);
-        reserva.getQuarto().setDisponivel(true);
-        System.out.println("-> Check-out efetuado com sucesso na reserva #" + idReserva
-                + " | Total: " + reserva.getPrecoTotal() + "€");
+        reservation.setStatus(ReservationStatus.COMPLETED);
+        reservation.getRoom().setAvailable(true);
+        System.out.println("-> Check-out completed successfully for reservation #" + reservationId
+                + " | Total: " + reservation.getTotalPrice() + "€");
     }
 
-// ── MÉTODO AUXILIAR PRIVADO ───────────────────────────────────────────────
+    public Payment processPayment(int reservationId, PaymentMethod method)
+            throws ReservationNotFoundException, ReservationNotCompletedException, PaymentAlreadyProcessedException {
 
-    private Reserva encontrarReserva(int idReserva) throws ReservaNaoEncontradaException {
-        return hotel.getReservas().stream()
-                .filter(r -> r.getId() == idReserva)
+        Reservation reservation = findReservation(reservationId);
+
+        if (reservation.getStatus() != ReservationStatus.COMPLETED) {
+            throw new ReservationNotCompletedException(reservationId);
+        }
+
+        boolean alreadyPaid = hotel.getPayments().stream()
+                .anyMatch(payment -> payment.getReservation().getId() == reservationId);
+        if (alreadyPaid) {
+            throw new PaymentAlreadyProcessedException(reservationId);
+        }
+
+        Payment payment = new Payment(reservation, method);
+        hotel.addPayment(payment);
+        System.out.println("-> Payment processed successfully! " + payment);
+        return payment;
+    }
+
+    private Reservation findReservation(int reservationId) throws ReservationNotFoundException {
+        return hotel.getReservations().stream()
+                .filter(reservation -> reservation.getId() == reservationId)
                 .findFirst()
-                .orElseThrow(() -> new ReservaNaoEncontradaException(idReserva));
-    }
-
-    public Pagamento efetuarPagamento(int idReserva, MetodoPagamento metodo)
-            throws ReservaNaoEncontradaException, ReservaNaoConcluidaException, PagamentoJaEfetuadoException {
-
-        Reserva reserva = encontrarReserva(idReserva);
-
-        if (reserva.getEstado() != EstadoReserva.CONCLUIDA) {
-            throw new ReservaNaoConcluidaException(idReserva);
-        }
-
-        boolean jaFoiPago = hotel.getPagamentos().stream()
-                .anyMatch(p -> p.getReserva().getId() == idReserva);
-        if (jaFoiPago) {
-            throw new PagamentoJaEfetuadoException(idReserva);
-        }
-
-        Pagamento pagamento = new Pagamento(reserva, metodo);
-        hotel.adicionarPagamento(pagamento);
-        System.out.println("-> Pagamento efetuado com sucesso! " + pagamento);
-        return pagamento;
+                .orElseThrow(() -> new ReservationNotFoundException(reservationId));
     }
 }

@@ -1,47 +1,46 @@
 # hotel-management-system
-Este é um sistema de gestão hoteleira desenvolvido em Java com interface gráfica JavaFX. O projeto foi desenhado para gerir as operações fundamentais de um hotel, desde o registo de clientes e quartos até ao controlo de reservas e fluxos de check-in/out.
+This is a hotel management system built in Java with a JavaFX graphical interface. The project was designed to handle the core operations of a hotel, from customer and room registration to reservation control and check-in/check-out flows.
 
-O desenvolvimento deste projeto focou-se na aplicação prática de conceitos avançados de Programação Orientada a Objetos (POO) e arquitetura de software explorados em contexto académico.
+The project focuses on the practical application of advanced Object-Oriented Programming (OOP) and software architecture concepts explored in an academic context.
 
- Funcionalidades Principais
-Gestão de Clientes: Registo completo de hóspedes com validação de dados (NIF, Email, Telefone).
+## Main Features
+Customer Management: Complete guest registration with data validation (Tax ID, Email, Phone).
 
-Gestão de Quartos: Suporte para diferentes tipos de alojamento (Simples, Double, Suite) através de herança e classes abstratas.
+Room Management: Support for different accommodation types (Single, Double, Suite) through inheritance and abstract classes.
 
-Sistema de Reservas: Motor de reservas que verifica a disponibilidade de quartos e valida datas de entrada/saída.
+Reservation System: Booking engine that checks room availability and validates check-in/check-out dates.
 
-Fluxo de Operações: Controlo de estado de reserva, permitindo realizar Check-in, Check-out e processamento de pagamentos.
+Operations Flow: Reservation status control, allowing check-in, check-out, and payment processing.
 
-Interface Gráfica: UI moderna e intuitiva construída com JavaFX, utilizando layouts dinâmicos como BorderPane e VBox.
+Graphical Interface: A modern and intuitive UI built with JavaFX, using dynamic layouts such as BorderPane and VBox.
 
-Conceitos de Programação Aplicados
-Este projeto serve como demonstração prática dos seguintes tópicos:
+## Programming Concepts Applied
+This project demonstrates the following topics:
 
-Herança e Polimorfismo: Utilização de classes abstratas (Pessoa, Quarto) e especializações para reutilização de código e comportamento polimórfico.
+Inheritance and Polymorphism: Use of abstract classes (Person, Room) and specializations for code reuse and polymorphic behavior.
 
-Tratamento de Exceções: Implementação de uma hierarquia de exceções customizadas para gerir erros de negócio (ex: QuartoIndisponivelException).
+Exception Handling: A hierarchy of custom exceptions for business errors (e.g. RoomUnavailableException).
 
-Coleções (ArrayList): Gestão dinâmica de dados em memória utilizando a API de Collections do Java.
+Collections (ArrayList): Dynamic in-memory data management using the Java Collections API.
 
-Encapsulamento e Validação: Proteção de dados através de modificadores de acesso e lógica de validação centralizada.
+Encapsulation and Validation: Data protection through access modifiers and centralized validation logic.
 
- Tecnologias Utilizadas
-Java 17+: Linguagem base.
+## Technologies Used
+Java 17+: Base language.
 
-JavaFX: Framework para a interface visual.
+JavaFX: UI framework.
 
-Maven: Gestão de dependências e construção do projeto.
+Maven: Dependency management and project build.
 
- Estrutura do Projeto
-O código está organizado seguindo uma separação clara de responsabilidades:
+## Project Structure
+The code is organized with a clear separation of responsibilities:
 
-hotel.model: Classes de dados (Entidades).
+hotel.model: Data classes (entities).
 
-hotel.service: Lógica de negócio e regras do sistema.
+hotel.service: Business logic and system rules.
 
-hotel.ui: Componentes da interface gráfica.
+hotel.ui: Graphical interface components.
 
-hotel.exception: Definições de erros específicos.
+hotel.exception: Specific error definitions.
 
-hotel.util: Ferramentas auxiliares e validadores.
-
+hotel.util: Helper tools and validators.
